@@ -16,23 +16,27 @@ builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
-builder.Services.AddStackExchangeRedisCache(options =>
+var redisUrl = builder.Configuration["UPSTASH_REDIS_REST_URL"];
+var redisToken = builder.Configuration["UPSTASH_REDIS_REST_TOKEN"];
+if (!string.IsNullOrEmpty(redisUrl) && !string.IsNullOrEmpty(redisToken))
 {
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-});
+    var redisHost = new Uri(redisUrl).Host;
+    builder.Services.AddStackExchangeRedisCache(options =>
+        options.Configuration = $"{redisHost}:6379,password={redisToken},ssl=True,abortConnect=False");
+}
+else
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+        options.Configuration = builder.Configuration.GetConnectionString("Redis")!);
+}
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",
-                "https://lambent-torrone-969915.netlify.app",
-                "https://catalog-production-5836.up.railway.app",
-                "https://basket-production-fd53.up.railway.app"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
     });
 });
 
