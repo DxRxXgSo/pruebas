@@ -6,7 +6,7 @@ namespace Basket.API.Basket.GetBasket
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/basket/{userName}", async (string userName, ISender sender) =>
+            app.MapGet("/api/basket/{userName}", async (string userName, ISender sender) =>
             {
                 var result = await sender.Send(new GetBasketQuery(userName));
                 return Results.Ok(result.Cart);

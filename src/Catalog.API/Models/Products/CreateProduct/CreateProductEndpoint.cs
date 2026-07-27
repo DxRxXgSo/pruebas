@@ -11,7 +11,7 @@ namespace Catalog.API.Models.Products.CreateProduct
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/products", async (CreateProductRequest request, ISender sender) =>
+            app.MapPost("/api/products", async (CreateProductRequest request, ISender sender) =>
             {
                 var command = new CreateProductCommand(request.Name, request.Description, request.Category, request.ImagesFiles, request.Price, request.ImageUrl);
                 var response = await sender.Send(command);

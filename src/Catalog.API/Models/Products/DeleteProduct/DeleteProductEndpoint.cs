@@ -6,7 +6,7 @@ namespace Catalog.API.Models.Products.DeleteProduct
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/products/{name}", async (string name, ISender sender) =>
+            app.MapDelete("/api/products/{name}", async (string name, ISender sender) =>
             {
                 var result = await sender.Send(new DeleteProductCommand(name));
                 return Results.Ok(new DeleteProductResponse(result.IsSuccess));
