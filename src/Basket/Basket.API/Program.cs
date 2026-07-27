@@ -1,10 +1,7 @@
 using Basket.API.Data;
-using Basket.API.Models;
 using BuildingBlocks.Behaviors;
 using BuildingBlocks.Exceptions.Handler;
 using FluentValidation;
-using Marten;
-using Microsoft.Extensions.Caching.Distributed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,17 +14,8 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-
-builder.Services.AddMarten(opts =>
-{
-    opts.Connection(builder.Configuration.GetConnectionString("Database")!);
-    opts.Schema.For<ShoppingCart>().Identity(x => x.UserName);
-}).UseLightweightSessions();
-
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
-//aqui agregams el patron de dise�o decorador mediante la libreria scrutor, configuramos redis para cache distri
-builder.Services.Decorate<IBasketRepository, CacheBasketRepository>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
@@ -39,7 +27,9 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://lambent-torrone-969915.netlify.app"
+                "https://lambent-torrone-969915.netlify.app",
+                "https://catalog-production-5836.up.railway.app",
+                "https://basket-production-fd53.up.railway.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();

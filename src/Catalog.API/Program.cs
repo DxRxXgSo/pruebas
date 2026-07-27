@@ -16,7 +16,9 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://lambent-torrone-969915.netlify.app"
+                "https://lambent-torrone-969915.netlify.app",
+                "https://catalog-production-5836.up.railway.app",
+                "https://basket-production-fd53.up.railway.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
