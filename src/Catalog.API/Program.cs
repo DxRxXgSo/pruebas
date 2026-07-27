@@ -29,6 +29,7 @@ var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 
+app.UsePathBase("/api");
 app.MapCarter();
 app.UseExceptionHandler(options => { });
 
