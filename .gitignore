@@ -1,0 +1,27 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Node / Vue
+node_modules/
+dist/
+.env
+.env.local
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Visual Studio
+.vs/
+
+# Docker Compose VS project
+docker-compose.dcproj
+
+# OS
+.DS_Store
+Thumbs.db
