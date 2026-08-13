@@ -90,6 +90,22 @@ services:
       - basket.api
       - catalog.api
 
+pdf.api:
+    container_name: pdf.api
+    build:
+      context: .
+      dockerfile: src/Pdf.API/Dockerfile
+
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Pdf__OrderingApiBaseUrl=http://ordering.api:8080
+      - Pdf__StoreName=E-Shop
+      - Pdf__TaxRate=0.16
+    ports:
+      - "8084:8080"
+    depends_on:
+      - ordering.api
+
 volumes:
   catalogdbdata:
   basketdbdata:

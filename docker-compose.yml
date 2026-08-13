@@ -29,6 +29,12 @@ services:
       context: .
       dockerfile: src/Ordering.API/Dockerfile
 
+  pdf.api:
+    image: ${DOCKER_REGISTRY-}pdfapi
+    build:
+      context: .
+      dockerfile: src/Pdf.API/Dockerfile
+
 volumes:
   postgres_catalog:
   postgres_basket:
