@@ -3,7 +3,10 @@ using Mapster;
 
 namespace Basket.API.Basket.StoreBasket
 {
-    public record StoreBasketRequest(ShoppingCart Cart);
+    public class StoreBasketRequest
+    {
+        public ShoppingCart Cart { get; set; } = new();
+    }
 
     public record StoreBasketResponse(string UserName);
 

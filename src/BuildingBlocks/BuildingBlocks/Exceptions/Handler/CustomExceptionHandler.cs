@@ -53,6 +53,13 @@ namespace BuildingBlocks.Exceptions.Handler
                     context.Response.StatusCode = StatusCodes.Status404NotFound
                 ),
 
+                ConflictException =>
+                (
+                    exception.Message,
+                    exception.GetType().Name,
+                    context.Response.StatusCode = StatusCodes.Status409Conflict
+                ),
+
                 _ =>
                 (
                     exception.Message,
