@@ -1,6 +1,6 @@
 namespace Catalog.API.Models.Products.UpdateProduct
 {
-    public record UpdateProductRequest(string Name, string Description, List<string> Category, string ImagesFiles, decimal Price, string ImageUrl = default);
+    public record UpdateProductRequest(string Name, string Description, List<string> Category, string ImagesFiles, decimal Price, string ImageUrl = default, int Stock = 10);
     public record UpdateProductResponse(bool IsSuccess);
 
     public class UpdateProductEndpoint : ICarterModule
@@ -9,7 +9,7 @@ namespace Catalog.API.Models.Products.UpdateProduct
         {
             app.MapPut("/api/products/{name}", async (string name, UpdateProductRequest request, ISender sender) =>
             {
-                var command = new UpdateProductCommand(name, request.Name, request.Description, request.Category, request.ImagesFiles, request.Price, request.ImageUrl);
+                var command = new UpdateProductCommand(name, request.Name, request.Description, request.Category, request.ImagesFiles, request.Price, request.ImageUrl, request.Stock);
                 var result = await sender.Send(command);
                 return Results.Ok(new UpdateProductResponse(result.IsSuccess));
             })

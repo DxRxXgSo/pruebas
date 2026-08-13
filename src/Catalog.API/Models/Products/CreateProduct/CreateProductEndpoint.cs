@@ -5,7 +5,7 @@ using MediatR;
 namespace Catalog.API.Models.Products.CreateProduct
 {
     public record CreateProductRequest(string Name, string Description,
-        List<string> Category, string ImagesFiles, decimal Price, string ImageUrl = default);
+        List<string> Category, string ImagesFiles, decimal Price, string ImageUrl = default, int Stock = 10);
     public record CreateProducResponse(Guid Id);
     public class CreateProductEndpoint : ICarterModule
     {
@@ -13,7 +13,7 @@ namespace Catalog.API.Models.Products.CreateProduct
         {
             app.MapPost("/api/products", async (CreateProductRequest request, ISender sender) =>
             {
-                var command = new CreateProductCommand(request.Name, request.Description, request.Category, request.ImagesFiles, request.Price, request.ImageUrl);
+                var command = new CreateProductCommand(request.Name, request.Description, request.Category, request.ImagesFiles, request.Price, request.ImageUrl, request.Stock);
                 var response = await sender.Send(command);
                 return Results.Created($"/products/{response.Id}", response);
             })
