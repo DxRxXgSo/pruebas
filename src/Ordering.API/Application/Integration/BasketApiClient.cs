@@ -39,4 +39,22 @@ public class BasketApiClient(HttpClient httpClient, ILogger<BasketApiClient> log
             throw new InternalServerException("Ocurrió un error al consultar el carrito del cliente.");
         }
     }
+
+    public async Task ClearBasketAsync(string basketId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var response = await httpClient.DeleteAsync($"/api/basket/{Uri.EscapeDataString(basketId)}", cancellationToken);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return;
+
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex) when (ex is not InternalServerException)
+        {
+            logger.LogError(ex, "Error al vaciar el carrito {BasketId} tras generar la orden", basketId);
+            throw new InternalServerException("Ocurrió un error al vaciar el carrito del cliente.");
+        }
+    }
 }

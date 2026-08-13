@@ -52,6 +52,20 @@ public class CreateOrderCommandHandler(
         var saved = await repository.CreateAsync(order, cancellationToken);
         var created = saved.Id == order.Id;
 
+        if (created)
+        {
+            try
+            {
+                await basketApiClient.ClearBasketAsync(command.BasketId, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex,
+                    "No se pudo vaciar el carrito {BasketId} tras generar la orden {OrderId}",
+                    command.BasketId, saved.Id);
+            }
+        }
+
         logger.LogInformation(
             "Orden {OrderId} creada para el cliente {CustomerId} por un total de {Total} (creada: {Created})",
             saved.Id, saved.CustomerId, saved.Total, created);
