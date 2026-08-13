@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Application.Orders.CreateOrder;
 using Ordering.API.Application.Orders.GetOrderById;
 using Ordering.API.Application.Orders.GetOrdersByCustomer;
+using Ordering.API.Application.Orders.GetOrders;
 using Ordering.API.Application.Orders.UpdateOrderStatus;
 using Ordering.API.Domain;
 
@@ -60,6 +61,16 @@ public static class OrdersEndpoints
         .Produces<List<Domain.Order>>(StatusCodes.Status200OK)
         .WithSummary("Órdenes por cliente")
         .WithDescription("Lista todas las órdenes de compra de un cliente.");
+
+        group.MapGet("/", async (ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrdersQuery());
+            return Results.Ok(result.Orders);
+        })
+        .WithName("GetAllOrders")
+        .Produces<List<Domain.Order>>(StatusCodes.Status200OK)
+        .WithSummary("Todas las órdenes")
+        .WithDescription("Lista todas las órdenes de compra registradas en el sistema.");
 
         group.MapPatch("/{id}/status", async (string id, [FromBody] UpdateOrderStatusRequest request, ISender sender) =>
         {

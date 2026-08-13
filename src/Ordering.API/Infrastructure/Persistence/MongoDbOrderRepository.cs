@@ -53,6 +53,22 @@ public class MongoDbOrderRepository(
         }
     }
 
+    public async Task<List<Order>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await _orders
+                .Find(_ => true)
+                .SortByDescending(o => o.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al consultar todas las órdenes");
+            throw new InternalServerException("Ocurrió un error al consultar las órdenes.");
+        }
+    }
+
     public async Task<Order> CreateAsync(Order order, CancellationToken cancellationToken = default)
     {
         try

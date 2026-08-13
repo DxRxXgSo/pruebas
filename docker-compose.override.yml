@@ -48,6 +48,15 @@ services:
     ports:
       - "6379:6379"
 
+  mongodb:
+    container_name: mongodb
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodbdata:/data/db
+
   basket.api:
     container_name: basket.api
     build:
@@ -70,7 +79,7 @@ services:
 
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - Ordering__MongoDbConnectionString=${MONGODB_CONNECTION_STRING}
+      - Ordering__MongoDbConnectionString=${MONGODB_CONNECTION_STRING:-mongodb://mongodb:27017}
       - Ordering__MongoDbDatabaseName=OrderingDb
       - Ordering__BasketApiBaseUrl=http://basket.api:8080
       - Ordering__CatalogApiBaseUrl=http://catalog.api:8080
@@ -84,3 +93,4 @@ services:
 volumes:
   catalogdbdata:
   basketdbdata:
+  mongodbdata:

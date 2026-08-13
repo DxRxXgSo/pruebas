@@ -21,10 +21,17 @@ builder.Services.Configure<OrderingSettings>(builder.Configuration.GetSection("O
 var settings = builder.Configuration.GetSection("Ordering").Get<OrderingSettings>() ?? new OrderingSettings();
 
 if (string.IsNullOrWhiteSpace(settings.MongoDbConnectionString))
-    throw new InvalidOperationException(
+{
+    var logger = LoggerFactory.Create(b => b.AddConsole()).CreateLogger("Program");
+    logger.LogError(
         "No se encontró la cadena de conexión de MongoDB Atlas. Configure la variable de entorno " +
-        "Ordering__MongoDbConnectionString (o MONGODB_CONNECTION_STRING) o use user-secrets " +
-        "(dotnet user-secrets set Ordering:MongoDbConnectionString \"<cadena>\").");
+        "Ordering__MongoDbConnectionString (o MONGODB_CONNECTION_STRING). El servicio arranca pero las " +
+        "operaciones de órdenes devolverán error hasta que se configure.");
+}
+
+var port = Environment.GetEnvironmentVariable("PORT");
+if (int.TryParse(port, out var portNumber))
+    builder.WebHost.UseUrls($"http://+:{portNumber}");
 
 builder.Services.AddSingleton(new OrderingDbContext(settings.MongoDbConnectionString, settings.MongoDbDatabaseName));
 builder.Services.AddScoped<IOrderRepository, MongoDbOrderRepository>();
@@ -69,15 +76,18 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 var dbContext = app.Services.GetRequiredService<OrderingDbContext>();
-try
+_ = Task.Run(async () =>
 {
-    await dbContext.EnsureIndexesAsync();
-}
-catch (Exception ex)
-{
-    app.Logger.LogWarning(ex, "No se pudieron garantizar los índices de MongoDB al iniciar. " +
-        "Se reintentará en la siguiente operación; el servicio continúa iniciando.");
-}
+    try
+    {
+        await dbContext.EnsureIndexesAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "No se pudieron garantizar los índices de MongoDB al iniciar. " +
+            "Se reintentará en la siguiente operación; el servicio continúa iniciando.");
+    }
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();

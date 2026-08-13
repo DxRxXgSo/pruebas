@@ -8,6 +8,9 @@ services:
   distributedcache:
     image: redis
 
+  mongodb:
+    image: mongo:7
+
   basket.api:
     image: ${DOCKER_REGISTRY-}basketapi
     build:

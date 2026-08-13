@@ -5,16 +5,27 @@ namespace Ordering.API.Infrastructure.Persistence;
 
 public class OrderingDbContext
 {
-    private readonly IMongoDatabase _database;
+    private readonly IMongoDatabase? _database;
 
     public OrderingDbContext(string connectionString, string databaseName)
     {
-        var client = new MongoClient(connectionString);
-        _database = client.GetDatabase(databaseName);
+        if (!string.IsNullOrWhiteSpace(connectionString))
+        {
+            var settings = MongoClientSettings.FromConnectionString(connectionString);
+            settings.SslSettings = new SslSettings
+            {
+                CheckCertificateRevocation = false,
+                EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+            };
+            var client = new MongoClient(settings);
+            _database = client.GetDatabase(databaseName);
+        }
     }
 
     public IMongoCollection<Domain.Order> Orders =>
-        _database.GetCollection<Domain.Order>("orders");
+        _database?.GetCollection<Domain.Order>("orders")
+        ?? throw new InvalidOperationException(
+            "MongoDB no está configurado: falta la cadena de conexión (Ordering__MongoDbConnectionString).");
 
     public async Task EnsureIndexesAsync(CancellationToken cancellationToken = default)
     {
