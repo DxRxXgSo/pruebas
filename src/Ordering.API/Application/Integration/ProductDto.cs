@@ -3,8 +3,7 @@ namespace Ordering.API.Application.Integration;
 public record ProductDto(
     string Id,
     string Name,
-    decimal Price,
-    int? Stock);
+    decimal Price);
 
 public record PaginatedProductsResponse(
     int PageIndex,

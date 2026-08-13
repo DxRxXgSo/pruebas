@@ -9,8 +9,7 @@ namespace Catalog.API.Models.Products.UpdateProduct
         List<string> Category,
         string ImagesFiles,
         decimal Price,
-        string ImageUrl = default,
-        int Stock = 10) : ICommand<UpdateProductResult>;
+        string ImageUrl = default) : ICommand<UpdateProductResult>;
 
     public record UpdateProductResult(bool IsSuccess);
 
@@ -31,7 +30,6 @@ namespace Catalog.API.Models.Products.UpdateProduct
             product.ImageFiles = command.ImagesFiles;
             product.ImageUrl = command.ImageUrl;
             product.Price = command.Price;
-            product.Stock = command.Stock;
 
             session.Update(product);
             await session.SaveChangesAsync(cancellationToken);

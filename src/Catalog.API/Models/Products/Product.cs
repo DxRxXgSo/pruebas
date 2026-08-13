@@ -9,6 +9,5 @@
         public string ImageFiles { get; set; } = default;
         public string ImageUrl { get; set; } = default;
         public decimal Price { get; set; }
-        public int Stock { get; set; } = 10;
     }
 }

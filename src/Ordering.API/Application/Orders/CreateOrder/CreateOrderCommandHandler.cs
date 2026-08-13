@@ -45,31 +45,12 @@ public class CreateOrderCommandHandler(
             if (product is null)
                 throw new BadRequestException(
                     $"El producto \"{item.ProductName}\" no existe en el catálogo. La orden no puede generarse.");
-
-            if (product.Stock is not null && item.Quantity > product.Stock.Value)
-                throw new BadRequestException(
-                    $"No hay stock suficiente de \"{item.ProductName}\": la cantidad solicitada es {item.Quantity} " +
-                    $"y solo hay {product.Stock.Value} disponible(s).");
         }
 
         var order = BuildOrder(command, basket, settings.Value.TaxRate);
 
         var saved = await repository.CreateAsync(order, cancellationToken);
         var created = saved.Id == order.Id;
-
-        foreach (var item in saved.Items)
-        {
-            try
-            {
-                await catalogApiClient.DecrementStockAsync(item.ProductName, item.Quantity, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex,
-                    "No se pudo descontar el stock de {ProductName} ({Quantity}) para la orden {OrderId}",
-                    item.ProductName, item.Quantity, saved.Id);
-            }
-        }
 
         logger.LogInformation(
             "Orden {OrderId} creada para el cliente {CustomerId} por un total de {Total} (creada: {Created})",

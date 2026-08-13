@@ -31,13 +31,4 @@ public class CatalogApiClient(HttpClient httpClient, ILogger<CatalogApiClient> l
             throw new InternalServerException("Ocurrió un error al validar los productos del catálogo.");
         }
     }
-
-    public async Task DecrementStockAsync(string productName, int quantity, CancellationToken cancellationToken = default)
-    {
-        var url = $"/api/products/{Uri.EscapeDataString(productName)}/stock";
-        var body = JsonContent.Create(new { quantity });
-
-        using var response = await httpClient.PatchAsync(url, body, cancellationToken);
-        response.EnsureSuccessStatusCode();
-    }
 }
